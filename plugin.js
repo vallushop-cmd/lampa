@@ -1,33 +1,24 @@
 (function () {
-    'use strict';
-
-    function injectExitMenu() {
-        // Ищем окно выхода (оно появляется справа)
-        var exitMenu = $('.confirm.type--confirm'); 
+    setInterval(function(){
+        // Ищем окно, где написано "Выход"
+        var box = $('.confirm__title:contains("Выход")').parent();
         
-        if (exitMenu.length > 0) {
-            // Если кнопка YouTube уже добавлена, ничего не делаем
-            if (exitMenu.find('.custom-exit-button').length > 0) return;
-
-            // Создаем кнопку YouTube в стиле меню выхода
-            var ytBtn = $('<div class="confirm__button selector custom-exit-button">YouTube</div>');
-
-            // При нажатии переходим на YouTube
-            ytBtn.on('click', function() {
+        // Если окно открыто и нашей кнопки еще нет
+        if (box.length > 0 && $('.my-yt').length == 0) {
+            
+            // Создаем кнопку в стиле твоей Лампы
+            var btn = $('<div class="confirm__button selector my-yt">YouTube</div>');
+            
+            // При нажатии - переход
+            btn.on('click', function(){
                 window.location.href = 'https://www.youtube.com';
             });
 
-            // Вставляем кнопку над кнопкой "Да, выйти"
-            exitMenu.find('.confirm__content').append(ytBtn);
+            // Вставляем кнопку в список
+            box.find('.confirm__content').append(btn);
             
-            // Обновляем навигацию пульта, чтобы кнопка стала кликабельной
-            if (window.Lampa && Lampa.Controller) {
-                Lampa.Controller.toggle('confirm');
-            }
+            // Заставляем пульт "увидеть" новую кнопку
+            if(window.Lampa) Lampa.Controller.toggle('confirm');
         }
-    }
-
-    // Постоянно проверяем, не открылось ли меню выхода справа
-    setInterval(injectExitMenu, 500);
-
+    }, 500);
 })();

@@ -5,6 +5,6 @@
         title: 'YouTube',
         icon: 'youtube',
         source: 'external',
-        url: 'https://www.youtube.com/tv'
+        url: 'https://www.youtube.com'
     });
 })();

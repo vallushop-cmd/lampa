@@ -2,8 +2,7 @@
     'use strict';
 
     function init() {
-        // Подменяем только функцию показа меню выхода
-        Lampa.Exit.show = function () {
+        var startMenu = function () {
             Lampa.Select.show({
                 title: 'Меню выхода',
                 items: [
@@ -29,9 +28,13 @@
                 }
             });
         };
+
+        // Ждем 1 секунду после старта и принудительно подменяем функцию выхода
+        setTimeout(function(){
+            Lampa.Exit.show = startMenu;
+        }, 1000);
     }
 
-    // Минимальный запуск без лишних проверок
     if (window.appready) init();
     else Lampa.Listener.follow('app', function (e) { if (e.type == 'ready') init(); });
 })();

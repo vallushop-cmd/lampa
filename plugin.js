@@ -1,10 +1,9 @@
 (function () {
     'use strict';
-    function init() {
-        // ЭТА СТРОКА ПОКАЖЕТ, РАБОТАЕТ ЛИ ПЛАГИН ВООБЩЕ
-        Lampa.Noty.show('Плагин Выхода загружен!');
 
-        var startMenu = function () {
+    function init() {
+        // Подменяем только функцию показа меню выхода
+        Lampa.Exit.show = function () {
             Lampa.Select.show({
                 title: 'Меню выхода',
                 items: [
@@ -15,9 +14,9 @@
                 ],
                 onSelect: function (item) {
                     if (item.action == 'yt') window.location.href = 'https://www.youtube.com/tv';
-                    if (item.action == 'rt') window.location.href = 'https://rutube.ru/tv-release/';
-                    if (item.action == 'rel') window.location.reload();
-                    if (item.action == 'exit') {
+                    else if (item.action == 'rt') window.location.href = 'https://rutube.ru/tv-release/';
+                    else if (item.action == 'rel') window.location.reload();
+                    else if (item.action == 'exit') {
                         if (Lampa.Platform.is('tizen')) tizen.application.getCurrentApplication().exit();
                         else if (Lampa.Platform.is('webos')) window.close();
                         else if (Lampa.Platform.is('android')) Lampa.Android.exit();
@@ -30,16 +29,9 @@
                 }
             });
         };
-
-        // Заменяем стандартную функцию
-        Lampa.Exit.show = startMenu;
-        
-        // Дополнительный перехват для некоторых сборок
-        Lampa.Listener.follow('app', function (e) {
-            if (e.type == 'exit') startMenu();
-        });
     }
 
+    // Минимальный запуск без лишних проверок
     if (window.appready) init();
     else Lampa.Listener.follow('app', function (e) { if (e.type == 'ready') init(); });
 })();

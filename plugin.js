@@ -1,23 +1,16 @@
 (function () {
-
     if (!window.Lampa) return;
 
-    // Ждём, когда всё загрузится
-    Lampa.Listener.follow('app', function (e) {
-        if (e.type !== 'ready') return;
+    // ждём, когда приложение готово
+    window.addEventListener('app:ready', function () {
 
-        // Добавляем в меню YouTube
+        // добавить пункт в меню
         Lampa.MainMenu.add({
             title: 'YouTube',
             icon: 'youtube',
-            onClick: function () {
-                // для Tizen запускаем системный YouTube
-                Lampa.Platform.open('tizen://launch?appId=111299001912');
-            }
+            source: 'external',
+            url: 'tizen://launch?appId=111299001912'
         });
 
-        // Обновляем меню
-        Lampa.Controller.update('menu');
     });
-
 })();

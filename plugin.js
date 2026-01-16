@@ -2,31 +2,25 @@
     'use strict';
 
     function startPlugin() {
-        console.log('Плагин: Запуск создания меню');
-        
-        // Функция добавления пунктов
-        function addItems() {
-            // Проверяем, не добавили ли мы уже пункты (чтобы не дублировать)
+        var addItems = function() {
+            // Если кнопка уже есть, ничего не делаем
             if ($('.menu__item[data-component="custom_yt"]').length > 0) return;
 
-            // Добавляем YouTube
+            // Пробуем добавить через официальное API
             Lampa.Menu.add({
                 title: 'YouTube',
-                icon: '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" fill="white"/></svg>',
-                component: 'custom_yt',
-                page: true // Помогает отобразить в некоторых версиях
+                icon: '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M10 15l5.197-3L10 9v6z" fill="white"/><path d="M21.564 7.147c-.243-.907-.954-1.618-1.861-1.86-1.641-.44-8.203-.44-8.203-.44s-6.562 0-8.203.44c-.907.242-1.618.953-1.86 1.86-.44 1.64-.44 5.063-.44 5.063s0 3.423.44 5.063c.242.907.953 1.618 1.86 1.86 1.641.44 8.203.44 8.203.44s6.562 0 8.203-.44c.907-.242 1.618-.953 1.861-1.86.44-1.64.44-5.063.44-5.063s0-3.423-.44-5.063z" fill="white"/></svg>',
+                component: 'custom_yt'
             });
 
-            // Добавляем Сервис
             Lampa.Menu.add({
                 title: 'Сервис',
-                icon: '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="white" stroke-width="2" fill="none"/></svg>',
-                component: 'custom_srv',
-                page: true
+                icon: '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" fill="none"/><path d="M12 7v5l3 3" stroke="white" stroke-width="2" fill="none"/></svg>',
+                component: 'custom_srv'
             });
-        }
+        };
 
-        // Регистрируем компоненты
+        // Логика работы кнопок
         Lampa.Component.add('custom_yt', {
             render: function() {
                 window.location.href = 'https://www.youtube.com';
@@ -39,30 +33,29 @@
                 Lampa.Select.show({
                     title: 'Сервис',
                     items: [
-                        {title: 'Перезагрузить', action: 'rel'},
-                        {title: 'Очистить кэш', action: 'res'}
+                        {title: 'Перезагрузить Lampa', action: 'rel'},
+                        {title: 'Очистить кэш (Reset)', action: 'res'}
                     ],
                     onSelect: function(item) {
                         if (item.action == 'rel') window.location.reload();
                         if (item.action == 'res') { localStorage.clear(); window.location.reload(); }
                     },
-                    onBack: function() { 
-                        Lampa.Select.close(); 
-                        Lampa.Controller.toggle('menu'); 
-                    }
+                    onBack: function() { Lampa.Select.close(); Lampa.Controller.toggle('menu'); }
                 });
                 return $('<div></div>');
             }
         });
 
-        // Пытаемся добавить пункты сразу
-        addItems();
-        
-        // И еще раз через 2 секунды на случай медленной загрузки меню
-        setTimeout(addItems, 2000);
+        // ЗАПУСК: Проверяем и добавляем меню каждые 500мс в течение 10 секунд
+        var attempts = 0;
+        var timer = setInterval(function() {
+            addItems();
+            attempts++;
+            if (attempts > 20) clearInterval(timer); 
+        }, 500);
     }
 
-    // Слушаем полную готовность приложения
+    // Ждем старта приложения
     if (window.appready) startPlugin();
     else Lampa.Listener.follow('app', function (e) {
         if (e.type == 'ready') startPlugin();

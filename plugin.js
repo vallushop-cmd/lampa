@@ -29,10 +29,21 @@
             });
         };
 
-        // Ждем 1 секунду после старта и принудительно подменяем функцию выхода
-        setTimeout(function(){
+        // Жёсткая подмена: блокируем стандартную функцию, чтобы Лампа не могла её вернуть назад
+        try {
+            Object.defineProperty(Lampa.Exit, 'show', {
+                value: startMenu,
+                writable: false, // Запрещаем системе перезаписывать эту функцию
+                configurable: true
+            });
+        } catch(e) {
             Lampa.Exit.show = startMenu;
-        }, 1000);
+        }
+
+        // На всякий случай дублируем вызов через 2 секунды
+        setTimeout(function() {
+            Lampa.Exit.show = startMenu;
+        }, 2000);
     }
 
     if (window.appready) init();

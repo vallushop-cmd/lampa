@@ -6,20 +6,19 @@
         
         var item = $('<li class="menu__item selector" data-action="exit_r"><div class="menu__ico">' + ico + '</div><div class="menu__text">Выход</div></li>');
 
-        item.on("hover:enter", function () {
+        item.on("hover:enter click", function () {
             Lampa.Activity.out();
             if (Lampa.Platform.is('apple_tv')) window.location.assign('exit://exit');
             if (Lampa.Platform.is("tizen")) tizen.application.getCurrentApplication().exit();
             if (Lampa.Platform.is("webos")) window.close();
             if (Lampa.Platform.is("android")) Lampa.Android.exit();
-            if (Lampa.Platform.is("nw")) nw.Window.get().close();
+            if (Lampa.Platform.is("nw")) window.nw && nw.Window.get().close();
         });
 
-        // Вставляем во второй список меню (там где настройки)
+        // Вставляем строго как у автора
         $(".menu .menu__list").eq(1).append(item);
     }
 
-    // Ждем готовности Лампы
     if (window.appready) start();
     else {
         Lampa.Listener.follow("app", function (e) {

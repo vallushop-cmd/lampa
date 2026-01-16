@@ -1,45 +1,38 @@
- (function () {
+(function () {
     "use strict";
 
-    // 1. Добавляем перевод
-    Lampa.Lang.add({
-        yt_menu: {
-            ru: "YouTube",
-            en: "YouTube"
-        }
-    });
-
-    // 2. Функция добавления кнопок
-    function add() {
-        // Проверка на дубликаты
-        if ($('.menu__item[data-action="youtube_go"]').length > 0) return;
-
-        var ico = '<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M10 15l5.197-3L10 9v6z" fill="#fff"/><path d="M21.564 7.147c-.243-.907-.954-1.618-1.861-1.86-1.641-.44-8.203-.44-8.203-.44s-6.562 0-8.203.44c-.907.242-1.618.953-1.86 1.86-.44 1.64-.44 5.063-.44 5.063s0 3.423.44 5.063c.242.907.953 1.618 1.86 1.86 1.641.44 8.203.44 8.203.44s6.562 0 8.203-.44c.907-.242 1.618-.953 1.861-1.86.44-1.64.44-5.063.44-5.063s0-3.423-.44-5.063z" fill="#fff"/></svg>';
-        
-        var menu_item = $(
-            '<li class="menu__item selector" data-action="youtube_go">' +
-                '<div class="menu__ico">' + ico + '</div>' +
-                '<div class="menu__text">' + Lampa.Lang.translate("yt_menu") + '</div>' +
-            '</li>'
-        );
-
-        // Обработка клика
-        menu_item.on("hover:enter", function () {
-            window.location.href = 'https://www.youtube.com';
-        });
-
-        // Вставка во второй список меню (где настройки)
-        $(".menu .menu__list").eq(1).append(menu_item);
-    }
-
-    // 3. Правильный запуск без ошибок
-    if (window.appready) add();
-    else {
-        Lampa.Listener.follow("app", function (e) {
-            if (e.type == "ready") {
-                // Небольшая задержка, чтобы jQuery успел проснуться
-                setTimeout(add, 100);
+    // Добавляем переводы (безопасно)
+    if (window.Lampa && Lampa.Lang) {
+        Lampa.Lang.add({
+            exit_menu: {
+                ru: "Выход",
+                en: "Exit",
+                uk: "Вихід",
+                be: "Вынахад",
+                zh: "出口",
+                pt: "Saída",
+                bg: "Изход"
             }
         });
     }
-})();
+
+    function add() {
+        // Проверка: если кнопка уже есть, не добавляем вторую
+        if ($('.menu__item[data-action="exit_r"]').length > 0) return;
+
+        var ico = '<svg version="1.1" id="exit" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="width:1.5em; height:1.5em;"><g><path fill="currentColor" d="M256,5.1c138.6,0,250.9,112.3,250.9,250.9S394.6,506.9,256,506.9S5.1,394.6,5.1,256S117.4,5.1,256,5.1z M256,40.1C136.7,40.1,40.1,136.7,40.1,256S136.7,471.9,256,471.9S471.9,375.3,471.9,256S375.3,40.1,256,40.1z M311.4,176.6 c6.7-6.7,17.5-6.7,24.2,0c6.7,6.7,6.7,17.5,0,24.2l-55.1,55.1l55.1,55c6.7,6.7,6.7,17.5,0,24.2c-6.7,6.7-17.5,6.7-24.2,0L256.3,280 l-55.1,55.1c-6,6-15.4,6.6-22.1,1.8l-2.2-1.8c-6.7-6.7-6.7-17.5,0-24.2l55.1-55l-55.1-55c-6.7-6.7-6.7-17.5,0-24.2s17.5-6.7,24.2,0 l55.1,55.1L311.4,176.6z"/></g></svg>';
+        
+        var menu_items = $(
+            '<li class="menu__item selector" data-action="exit_r"><div class="menu__ico">' +
+            ico +
+            '</div><div class="menu__text">' +
+            (Lampa.Lang ? Lampa.Lang.translate("exit_menu") : "Выход") +
+            "</div></li>"
+        );
+
+        // Обработка нажатия
+        menu_items.on("click hover:enter", function () {
+            if (window.Lampa && Lampa.Activity) Lampa.Activity.out();
+            
+            if (Lampa.Platform.is('apple_tv')) window.location.assign('exit://exit');
+            else if (

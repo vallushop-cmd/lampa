@@ -1,66 +1,45 @@
 (function () {
     'use strict';
+    function init() {
+        // ЭТА СТРОКА ПОКАЖЕТ, РАБОТАЕТ ЛИ ПЛАГИН ВООБЩЕ
+        Lampa.Noty.show('Плагин Выхода загружен!');
 
-    function startExitPlugin() {
-        // Подменяем стандартную функцию выхода Lampa
-        Lampa.Exit.show = function () {
+        var startMenu = function () {
             Lampa.Select.show({
                 title: 'Меню выхода',
                 items: [
-                    {
-                        title: 'YouTube TV',
-                        action: 'youtube'
-                    },
-                    {
-                        title: 'RuTube TV',
-                        action: 'rutube'
-                    },
-                    {
-                        title: 'Перезагрузить Лампу',
-                        action: 'reload'
-                    },
-                    {
-                        title: 'Выйти из приложения',
-                        action: 'exit'
-                    }
+                    {title: 'YouTube TV', action: 'yt'},
+                    {title: 'RuTube TV', action: 'rt'},
+                    {title: 'Перезагрузить', action: 'rel'},
+                    {title: 'Выход', action: 'exit'}
                 ],
                 onSelect: function (item) {
-                    if (item.action === 'youtube') {
-                        window.location.href = 'https://www.youtube.com/tv';
-                    } else if (item.action === 'rutube') {
-                        window.location.href = 'https://rutube.ru/tv-release/';
-                    } else if (item.action === 'reload') {
-                        window.location.reload();
-                    } else if (item.action === 'exit') {
-                        // Логика выхода для разных платформ
-                        if (Lampa.Platform.is('tizen')) {
-                            tizen.application.getCurrentApplication().exit();
-                        } else if (Lampa.Platform.is('webos')) {
-                            window.close();
-                        } else if (Lampa.Platform.is('android')) {
-                            Lampa.Android.exit();
-                        } else {
-                            window.location.href = 'about:blank';
-                        }
+                    if (item.action == 'yt') window.location.href = 'https://www.youtube.com/tv';
+                    if (item.action == 'rt') window.location.href = 'https://rutube.ru/tv-release/';
+                    if (item.action == 'rel') window.location.reload();
+                    if (item.action == 'exit') {
+                        if (Lampa.Platform.is('tizen')) tizen.application.getCurrentApplication().exit();
+                        else if (Lampa.Platform.is('webos')) window.close();
+                        else if (Lampa.Platform.is('android')) Lampa.Android.exit();
+                        else window.location.href = 'about:blank';
                     }
                 },
                 onBack: function () {
-                    // Возвращаем фокус в основное меню при нажатии "Назад"
                     Lampa.Select.close();
                     Lampa.Controller.toggle('content');
                 }
             });
         };
-    }
 
-    // Ждем, пока Lampa полностью загрузится, прежде чем активировать плагин
-    if (window.appready) {
-        startExitPlugin();
-    } else {
+        // Заменяем стандартную функцию
+        Lampa.Exit.show = startMenu;
+        
+        // Дополнительный перехват для некоторых сборок
         Lampa.Listener.follow('app', function (e) {
-            if (e.type === 'ready') {
-                startExitPlugin();
-            }
+            if (e.type == 'exit') startMenu();
         });
     }
+
+    if (window.appready) init();
+    else Lampa.Listener.follow('app', function (e) { if (e.type == 'ready') init(); });
 })();
